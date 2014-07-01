@@ -10,7 +10,7 @@ var $s = (function(){
 	
 	/**
 	 * @param url
-	 * @param callback »Øµ÷º¯Êý
+	 * @param callback å›žè°ƒå‡½æ•°
 	 * @param options
 	 */
 	that.jsonp = function(url, callback, options) {
