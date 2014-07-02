@@ -1,6 +1,6 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.1',
+	var version = '0.0.2',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -8,6 +8,11 @@
 	//ID selector
 	that.$ = function(id) {
 		return $d.getElementById(id);
+	}
+	
+	//
+	that.$$ = function(node, tag_name) {
+		return (node || $d).getElementsByTagName(tag_name);
 	}
 	
 	//simple ua detect function
@@ -52,7 +57,7 @@
 	
 	/**
 	 * @param url
-	 * @param callback 回调函数
+	 * @param callback
 	 * @param options
 	 */
 	that.jsonp = function(url, callback, options) {
@@ -102,6 +107,32 @@
 		return format.replace(/(y+|M+|d+|h+|m+|s+)/g, function(v) {
 			return ((v.length>1?'0':'') + d[v.slice(-1)]).slice(-(v.length>2?v.length:2))
 		});
+	}
+	
+	that.getByteLen = function(val) {
+		val = val || '';
+		var len = 0;
+		for(var i=0; i<val.length; i++) {
+			if(val.charAt(i).match(/[^\x00-\xff]/ig) != null)
+				len += 2;
+			else
+				len += 1;
+		}
+		return len;
+	}
+
+	that.truncate = function(val, len) {
+		val = val || '';
+		var n = 0;
+		for (var i=0; i<val.length; i++) {
+			if (val.charAt(i).match(/[^\x00-\xff]/ig) != null)
+				n += 2;
+			else
+				n += 1;
+			if (n > len)
+				return val.substring(0, i);
+		}
+		return val;
 	}
 	
 	return that;
