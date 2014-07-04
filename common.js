@@ -1,6 +1,6 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.2',
+	var version = '0.0.3',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -133,6 +133,23 @@
 				return val.substring(0, i);
 		}
 		return val;
+	}
+	
+	that.getCookie = function(name) {
+		return ($d.cookie.match('(^|; )'+name+'=([^;]*)') || 0)[2];
+	}
+	
+	that.setCookie = function(name, value, expireTime, domain) {
+		var cookie_to_set = [name, '=', value], exp = new Date();
+		if (expireTime != null) {
+			exp.setTime(exp.getTime() + expireTime);
+			cookie_to_set.push(';expires=' + exp.toGMTString());
+		}
+		cookie_to_set.push('; path=/');
+		if (domain) {
+			cookie_to_set.push('; domain=' + domain);
+		}
+		document.cookie = cookie_to_set.join('');
 	}
 	
 	return that;
