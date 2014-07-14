@@ -1,6 +1,6 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.3',
+	var version = '0.0.4',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -150,6 +150,18 @@
 			cookie_to_set.push('; domain=' + domain);
 		}
 		document.cookie = cookie_to_set.join('');
+	}
+	
+	that.viewport = function() {
+		//exclude the browser's scrollbar
+		var e = $d.compatMode == 'BackCompat' ? 'body' : 'documentElement';
+		return { width : $d[e].clientWidth, height : $d[e].clientHeight };
+	}
+	
+	that.pagearea = function() {
+		//include the browser's scrollbar
+		var e = $d.compatMode == 'BackCompat' ? 'body' : 'documentElement';
+		return { width : Math.max($d[e].clientWidth, $d[e].scrollWidth), height : Math.max($d[e].clientHeight, $d[e].scrollHeight) };
 	}
 	
 	return that;
