@@ -1,9 +1,11 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.4',
+	var version = '0.0.5',
 		that = {};
 	
 	var $d = that.$d = document;
+
+	var toString = Object.prototype.toString;
 	
 	//ID selector
 	that.$ = function(id) {
@@ -65,7 +67,7 @@
 			return;
 
 		options = options || {};
-		var callbackName = options.callbackName || ('sogoup' + new Date().getTime()%10000 + Math.floor(Math.random()*10000)), isAbort = false, beginTime, endTime, script;
+		var callbackName = options.callbackName || ('jsonp' + new Date().getTime()%10000 + Math.floor(Math.random()*10000)), isAbort = false, beginTime, endTime, script;
 
 		window[callbackName] = function() {
 			endTime = new Date();
@@ -91,7 +93,7 @@
 	
 	that.getParaFromJson = function(data, url) {
 		if (typeof data === 'object') {
-			url = url?[url+(url.indexOf('?') > 0?'':'?')]:[];
+			url = url ? [url + (url.indexOf('?') > 0 ? '' : '?')] : [];
 			for (k in data) {
 				if (data.hasOwnProperty(k)) {
 					url.push(k + '=' + encodeURIComponent(data[k]));
@@ -99,7 +101,7 @@
 			}
 			return url.join('&');
 		}
-		return url;
+		return url || '';
 	}
 	
 	that.date2str = function(date, format) {
@@ -163,6 +165,15 @@
 		var e = $d.compatMode == 'BackCompat' ? 'body' : 'documentElement';
 		return { width : Math.max($d[e].clientWidth, $d[e].scrollWidth), height : Math.max($d[e].clientHeight, $d[e].scrollHeight) };
 	}
+
+	var isType = function(type) {
+		return function(obj) {
+			return toString.call(obj) === '[object ' + type + ']';
+		}
+	}
+
+	that.isArray = isType('Array');
+	that.isFunction = isType('Function');
 	
 	return that;
 })();
