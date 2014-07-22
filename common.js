@@ -1,6 +1,6 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.5',
+	var version = '0.0.6',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -91,15 +91,16 @@
 		}
 	}
 	
-	that.getParaFromJson = function(data, url) {
+	var getParaFromJson = that.getParaFromJson = function(data, url) {
 		if (typeof data === 'object') {
-			url = url ? [url + (url.indexOf('?') > 0 ? '' : '?')] : [];
-			for (k in data) {
+			url += url.indexOf('?') > 0 ? '' : '?';
+			var params = [];
+			for (var k in data) {
 				if (data.hasOwnProperty(k)) {
-					url.push(k + '=' + encodeURIComponent(data[k]));
+					params.push(k + '=' + encodeURIComponent(data[k]));
 				}
 			}
-			return url.join('&');
+			return url + params.join('&');
 		}
 		return url || '';
 	}
@@ -164,6 +165,58 @@
 		//include the browser's scrollbar
 		var e = $d.compatMode == 'BackCompat' ? 'body' : 'documentElement';
 		return { width : Math.max($d[e].clientWidth, $d[e].scrollWidth), height : Math.max($d[e].clientHeight, $d[e].scrollHeight) };
+	}
+	
+	/*
+	$s.ajax({
+		type: 'GET|POST', default GET
+		url: url of ajax,
+		async: true|false, default true
+		timeout: number
+		dataType: 'xml|text', default text
+		data: request,
+		success: function(data){},
+		error: function(req,text,error){}
+	});
+	*/
+	that.ajax = function(options) {
+		var xhr, timer;
+		if (window.XMLHttpRequest) {	// code for IE7+, Firefox, Chrome, Opera, Safari
+			xhr = new XMLHttpRequest();
+		} else {	// code for IE6, IE5
+			xhr = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+		if (!xhr) return;
+		options = options || {};
+		var type = (!options.type || options.type == 'GET') ? 'GET' : 'POST',
+			async = options.async === undefined ? true : !!options.async,
+			dataType = (!options.dataType || options.dataType == 'text') ? 'text' : 'xml';
+		if (async) {
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					clearTimeout(timer);
+					if (xhr.status == 200) {
+						typeof options.success === 'function' && options.success(dataType == 'text' ? xhr.responseText : xhr.responseXML);
+					} else {//if (xhr.status == 404) {
+						typeof options.error === 'function' && options.error(xhr.statusText);
+					}
+				}
+			}
+		}
+		if (typeof options.timeout === 'number') {
+			timer = setTimeout(function() {
+				xhr.abort();
+				typeof options.error === 'function' && options.error('timeout');
+			}, options.timeout);
+		}
+		if (type == 'GET') {
+			xhr.open('GET', getParaFromJson(options.data, options.url), async);
+			xhr.send();
+		} else {
+			xhr.open('POST', options.url, async);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.send(getParaFromJson(options.data));
+		}
 	}
 
 	var isType = function(type) {
