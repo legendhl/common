@@ -93,7 +93,7 @@
 	
 	var getParaFromJson = that.getParaFromJson = function(data, url) {
 		if (typeof data === 'object') {
-			url += url.indexOf('?') > 0 ? '' : '?';
+			url = url ? url + (url.indexOf('?') > 0 ? '' : '?') : '';
 			var params = [];
 			for (var k in data) {
 				if (data.hasOwnProperty(k)) {
