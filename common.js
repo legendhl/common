@@ -227,6 +227,58 @@
 
 	that.isArray = isType('Array');
 	that.isFunction = isType('Function');
-	
+
+	var isElement = function(node) {
+		return node && typeof node === 'object' && node.nodeType === 1;
+	}
+
+	that.addClass = function(node, cls) {
+		if (!isElement(node) || !trim(cls)) {
+			return;
+		}
+		var className = ' ' + node.className + ' ', classNames = cls.split(rSpace), i;
+		for (i = 0; i < classNames.length; i++) {
+			if (className.indexOf(' ' + classNames[i] + ' ') == -1) {
+				className += ' ' + classNames[i] + ' ';
+			}
+		}
+		node.className = trim(className);
+	}
+
+	that.removeClass = function(node, cls) {
+		if (!isElement(node)) {
+			return;
+		}
+		if (!trim(cls)) {
+			node.className = '';
+			return;
+		}
+		var className = ' ' + node.className + ' ', classNames = cls.split(rSpace), i;
+		for (i = 0; i < classNames.length; i++) {
+			if (className.indexOf(' ' + classNames[i] + ' ') >= 0) {
+				className = className.replace(classNames[i] + ' ', '');
+			}
+		}
+		node.className = trim(className);
+	}
+
+	that.hasClass = function(node, cls) {
+		if (!isElement(node) || !trim(cls)) {
+			return false;
+		}
+		var className = ' ' + node.className + ' ', classNames = cls.split(/\s+/), i;
+		for (i = 0; i < classNames.length; i++) {
+			if (className.indexOf(' ' + classNames[i] + ' ') == -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	var rLeftSpace = /^\s+/, rRightSpace = /\s+$/, rSpace = /\s+/;
+	var trim = that.trim = function(str) {
+		return str ? str.toString().replace(rLeftSpace, '').replace(rRightSpace, '') : '';
+	}
+
 	return that;
 })();
