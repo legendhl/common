@@ -1,6 +1,6 @@
 ﻿var $s = (function(){
 	'use strict';
-	var version = '0.0.6',
+	var version = '0.0.7',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -280,5 +280,66 @@
 		return str ? str.toString().replace(rLeftSpace, '').replace(rRightSpace, '') : '';
 	}
 
+	that.xml2json = function(xml) {
+		var json, root;
+		root = parseXML(xml);
+		json = node2json(root);
+
+		function parseXML(xml) {
+			xml = DOMParser ? new DOMParser().parseFromString(xml, 'text/xml') : (new ActiveXObject('Microsoft.XMLDOM')).loadXML(xml);
+			return (xml.nodeType == 9) ? xml.documentElement : xml;
+		}
+
+		function jsVar(s) {
+			return String(s || '').replace(/-/g, '_');
+		}
+
+		function node2json(node) {
+			if (!node)
+				return null;
+			var txt = '', obj = null, att = null;
+			var nt = node.nodeType, nn = jsVar(node.localName || node.nodeName), nv = node.text || node.nodeValue || '';
+			if (node.childNodes && node.childNodes.length > 0) {
+				var i = 0, l = node.childNodes.length, cnode;
+				for (; i < l; i++) {
+					cnode = node.childNodes[i];
+					var cnt = cnode.nodeType, cnn = jsVar(cnode.localName || cnode.nodeName), cnv = cnode.text || cnode.nodeValue || '';
+					if (cnt === 8) {	//comment
+						continue;
+					} else if (cnt == 3 || cnt == 4 || !cnn) {
+						if (cnv.match(/^\s+$/)) {
+							continue;
+						}
+						txt += cnv.replace(/^\s+/,'').replace(/\s+$/,'');
+					} else {
+						obj = obj || {};
+						if (obj[cnn]) {
+							if (!(obj[cnn] instanceof Array)) {
+								obj[cnn] = [obj[cnn]];
+							}
+							obj[cnn].push(node2json(cnode));
+						} else {
+							obj[cnn] = node2json(cnode);
+						}
+					}
+				}
+			}
+			if (node.attributes && node.attributes.length > 0) {
+				att = {};
+				obj = obj || {};
+				for (var i = 0, l = node.attributes.length; i < l; i++) {
+					var at = node.attributes[i], atn = jsVar(at.name), atv = at.value;
+					att[atn] = atv;
+					obj[atn] = atv;
+				}
+			}
+			if (obj && txt) {
+				obj._text = txt;
+			}
+			return obj || txt;
+		}
+		return json;
+	}
+	
 	return that;
 })();
