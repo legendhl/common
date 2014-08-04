@@ -286,7 +286,14 @@
 		json = node2json(root);
 
 		function parseXML(xml) {
-			xml = DOMParser ? new DOMParser().parseFromString(xml, 'text/xml') : (new ActiveXObject('Microsoft.XMLDOM')).loadXML(xml);
+			if (window.DOMParser) {
+				xml = new DOMParser().parseFromString(xml, 'text/xml');
+			} else {
+				xml = new ActiveXObject('Microsoft.XMLDOM');
+				xml.async = 'false';
+				xml.loadXML(xml);
+			}
+			//xml = DOMParser ? new DOMParser().parseFromString(xml, 'text/xml') : (new ActiveXObject('Microsoft.XMLDOM')).loadXML(xml);
 			return (xml.nodeType == 9) ? xml.documentElement : xml;
 		}
 
