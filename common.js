@@ -1,6 +1,6 @@
-﻿var $s = (function(){
+﻿var $s = (function () {
 	'use strict';
-	var version = '0.0.7',
+	var version = '0.0.8',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -16,9 +16,21 @@
 	that.$$ = function(node, tag_name) {
 		return (node || $d).getElementsByTagName(tag_name);
 	}
+
+	that.bind = function(node, evts, funcs) {
+		if (node) {
+			for (var i in evts) {
+				if (window.attachEvent) {
+					node.attachEvent('on' + evts[i], funcs[i]);
+				} else {
+					node.addEventListener(evts[i], funcs[i], false);
+				}
+			}
+		}
+	}
 	
 	//simple ua detect function
-	that.ua = (function(){
+	that.ua = (function () {
 		var ua_text = window.navigator.userAgent.toLowerCase();
 		var ua = {};
 		if (window.opera) {
@@ -87,7 +99,7 @@
 		document.body.appendChild(script);
 		beginTime = new Date(); 
 		if (options.timeout) {
-			setTimeout(function(){isAbort = true;}, options.timeout);
+			setTimeout(function () {isAbort = true;}, options.timeout);
 		}
 	}
 	
