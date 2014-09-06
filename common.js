@@ -1,6 +1,6 @@
 ﻿var $s = (function () {
 	'use strict';
-	var version = '0.0.8',
+	var version = '0.0.9',
 		that = {};
 	
 	var $d = that.$d = document;
@@ -298,15 +298,15 @@
 		json = node2json(root);
 
 		function parseXML(xml) {
+			var xmlDoc;
 			if (window.DOMParser) {
-				xml = new DOMParser().parseFromString(xml, 'text/xml');
+				xmlDoc = new DOMParser().parseFromString(xml, 'text/xml');
 			} else {
-				xml = new ActiveXObject('Microsoft.XMLDOM');
-				xml.async = 'false';
-				xml.loadXML(xml);
+				xmlDoc = new ActiveXObject('Microsoft.XMLDOM');
+				xmlDoc.async = 'false';
+				xmlDoc.loadXML(xml);
 			}
-			//xml = DOMParser ? new DOMParser().parseFromString(xml, 'text/xml') : (new ActiveXObject('Microsoft.XMLDOM')).loadXML(xml);
-			return (xml.nodeType == 9) ? xml.documentElement : xml;
+			return (xmlDoc.nodeType == 9) ? xmlDoc.documentElement : xmlDoc;
 		}
 
 		function jsVar(s) {
